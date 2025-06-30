@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\Api\LogoutController;
+use App\Http\Controllers\API\TicketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,20 @@ Route::get("/test-me", function () {
     return 'Hello from Laravel!';
 });
 
+
+
+// AUTH
 Route::post('/login', LoginController::class)->name('login');
 
-Route::post('/logout', LogoutController::class)->name('logout');
+Route::middleware(['auth:api'])->group(function () {
+
+    // Ticket
+    Route::prefix('ticket')->as('ticket.')->group(function () {
+        Route::middleware(['role:admin'])->group(function () {
+            Route::get('/all', [TicketController::class, 'all'])->name('all');
+        });
+    });
+
+
+    Route::post('/logout', LogoutController::class)->name('logout');
+});
