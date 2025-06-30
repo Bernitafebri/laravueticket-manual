@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\LoginController;
+use App\Http\Controllers\Api\LogoutController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,3 +25,5 @@ Route::get("/test-me", function () {
 });
 
 Route::post('/login', LoginController::class)->name('login');
+
+Route::post('/logout', LogoutController::class)->name('logout');
