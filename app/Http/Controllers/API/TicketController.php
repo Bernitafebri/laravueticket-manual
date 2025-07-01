@@ -87,9 +87,41 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function updateStart(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'subject' => 'sometimes|required|string',
+            'desc'    => 'sometimes|required|string'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $ticket = Ticket::findOrFail($id);
+
+            // Update isi tiket
+            $ticketUpdateStart = Ticket::findOrFail($id)->update([
+                'subject'
+            ]);
+
+            $ticket->update($request->only(['subject', 'desc', 'status']));
+
+
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tiket berhasil diperbarui',
+                'data' => []
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat memperbarui tiket',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
