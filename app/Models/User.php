@@ -65,8 +65,13 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function getRoleAttribute()
+    public function tickets()
     {
-        return $this->attributes['role'];
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function mutasis()
+    {
+        return $this->hasMany(Mutasi::class);
     }
 }

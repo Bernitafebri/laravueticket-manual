@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('ticket_id');
             $table->integer('indeks')->default(1)->comment('default draft awal draft 1, jika revisi mengulang dari awal jadi 2, dst');
-            $table->string('status')->default('draft')->comment('1:draft,2: start,3: hold,4: review, 5:closed');
+            $table->string('status')->default('draft')->comment('draft, start,hold, review, closed');
             $table->text('ket')->nullable();
             $table->timestamps();
 

@@ -37,6 +37,8 @@ Route::middleware(['auth:api'])->group(function () {
         Route::middleware(['role:admin'])->group(function () {
             Route::get('/all', [TicketController::class, 'all'])->name('all');
         });
+
+        Route::post('/store', [TicketController::class, 'store'])->name('store');
     });
 
 
