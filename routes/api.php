@@ -36,8 +36,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('ticket')->as('ticket.')->group(function () {
         Route::middleware(['role:admin'])->group(function () {
             Route::get('/all', [TicketController::class, 'all'])->name('all');
+            Route::post('/start/{id}', [TicketController::class, 'updateStart'])->name('start');
         });
 
+        Route::get('/{id}', [TicketController::class, 'show'])->name('show');
         Route::post('/store', [TicketController::class, 'store'])->name('store');
     });
 

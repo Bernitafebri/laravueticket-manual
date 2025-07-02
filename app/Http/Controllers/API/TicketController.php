@@ -33,23 +33,17 @@ class TicketController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'subject' => 'required|string',
+            'desc' => 'required',
+            'files' => 'nullable|array',
+            'files.*' => 'file|max:2048'
+        ]);
+
         try {
             DB::beginTransaction();
-            $request->validate([
-                'subject' => 'required|string',
-                'desc' => 'required',
-                'files' => 'nullable|array',
-                'files.*' => 'file|max:2048'
-            ]);
 
-            $ticket                 = new Ticket();
-            $ticket->user_id        = auth('api')->user()->id;
-            $ticket->ticket_code    = Str::random(40);
-            $ticket->subject        = $request->subject;
-            $ticket->status         = 'draft';
-            $ticket->desc           = $request->desc;
-            $ticket->save();
-
+            $ticket = Ticket::createData(auth('api')->user()->id, Str::random(20), $request->subject, $request->desc);
 
             foreach ($request->file('files') as $file) {
                 if (in_array($file->getClientOriginalExtension(), ['exe', 'sh'])) {
@@ -61,7 +55,9 @@ class TicketController extends Controller
             }
 
             Mutasi::createMutasi(auth('api')->user()->id, $ticket->id);
-            DB::commit(); // sukses, simpan semua
+
+            DB::commit();
+
             return response()->json([
                 'success' => true,
                 'data'    => [],
@@ -81,7 +77,11 @@ class TicketController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $ticket = Ticket::findOrFail($id);
+        return response()->json([
+            'message' => 'Tiket berhasil diperbarui',
+            'data' => $ticket
+        ]);
     }
 
     /**
@@ -89,24 +89,12 @@ class TicketController extends Controller
      */
     public function updateStart(Request $request, string $id)
     {
-        $request->validate([
-            'subject' => 'sometimes|required|string',
-            'desc'    => 'sometimes|required|string'
-        ]);
 
         DB::beginTransaction();
 
         try {
             $ticket = Ticket::findOrFail($id);
-
-            // Update isi tiket
-            $ticketUpdateStart = Ticket::findOrFail($id)->update([
-                'subject'
-            ]);
-
-            $ticket->update($request->only(['subject', 'desc', 'status']));
-
-
+            $ticket->updateWithMutasiStart($request->status, auth()->id());
 
             DB::commit();
 
@@ -118,15 +106,12 @@ class TicketController extends Controller
             DB::rollBack();
 
             return response()->json([
-                'message' => 'Terjadi kesalahan saat memperbarui tiket',
+                'message' => 'Terjadi kesalahan saat memperbarui status tiket',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //

@@ -30,4 +30,41 @@ class Ticket extends Model
     {
         return self::latest()->first();
     }
+
+    public static function createData($user_id, $ticket_code, $subject, $desc, $status = 'draft')
+    {
+        return self::create([
+            'user_id'       => $user_id,
+            'ticket_code'   => $ticket_code,
+            'subject'       => $subject,
+            'status'        => $status,
+            'desc'          => $desc,
+            'created_at'    => now(),
+        ]);
+    }
+
+    public function updateWithMutasiStart($status, $user_id)
+    {
+        $old = $this->only(['subject', 'desc', 'status']); // ← ambil dari Ticket sebelum update
+
+        $this->update([
+            'status' => $status
+        ]);
+
+        $new = $this->only(['subject', 'desc', 'status']);
+
+        if (($attributes['status'] ?? null) === 'start') {
+            Mutasi::create([
+                'user_id'    => $user_id,
+                'ticket_id'  => $this->id,
+                'status'     => $this->status,
+                'indeks'     => Mutasi::where('ticket_id', $this->id)->first()->indeks,
+                'note'       => 'Otomatis saat status ' . $status,
+                'old_data'   => $old, // ← dari ticket
+                'new_data'   => $new,
+            ]);
+        }
+
+        return $this;
+    }
 }
