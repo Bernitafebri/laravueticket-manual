@@ -79,7 +79,7 @@ class TicketController extends Controller
     {
         $ticket = Ticket::findOrFail($id);
         return response()->json([
-            'message' => 'Tiket berhasil diperbarui',
+            'message' => 'Tiket berhasil didapat',
             'data' => $ticket
         ]);
     }
@@ -87,14 +87,39 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updateStart(Request $request, string $id)
+    public function updateStartHoldClosed(Request $request, string $id)
     {
 
         DB::beginTransaction();
 
         try {
             $ticket = Ticket::findOrFail($id);
-            $ticket->updateWithMutasiStart($request->status, auth()->id());
+            $ticket->updateStatusWithMutasi($request->status, $request->note, auth()->id());
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tiket berhasil diperbarui',
+                'data' => []
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat memperbarui status tiket',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateReview(Request $request, string $id)
+    {
+
+        DB::beginTransaction();
+
+        try {
+            $ticket = Ticket::findOrFail($id);
+            $ticket->updateReviewWithMutasi($request->subject, $request->desc, $request->status, $request->note, auth()->id());
 
             DB::commit();
 

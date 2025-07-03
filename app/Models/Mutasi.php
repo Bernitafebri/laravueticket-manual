@@ -8,7 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Mutasi extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'ticket_id', 'indeks', 'status', 'notes'];
+    protected $fillable = [
+        'user_id',
+        'ticket_id',
+        'indeks',
+        'status',
+        'ket',
+        'old_data',
+        'new_data',
+    ];
+    protected $casts = [
+        'old_data' => 'array',
+        'new_data' => 'array',
+    ];
     const DRAFT     = 'draft';
     const START     = 'start';
     const HOLD      = 'hold';
@@ -61,7 +73,7 @@ class Mutasi extends Model
             'ticket_id'  => $ticket_id,
             'status'     => $status,
             'indeks'     => $indeks,
-            'note'       => $note,
+            'ket'        => $note,
             'created_at' => now(),
         ]);
     }
