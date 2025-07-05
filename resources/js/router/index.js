@@ -140,6 +140,20 @@ const router = createRouter({
                 title: "Signup",
             },
         },
+
+        {
+            path: "/login",
+            // component: () => imxport("./Pages/Login.vue"),
+            component: () => import("../Pages/Auth/Login.vue"),
+        },
+        {
+            path: "/home",
+            component: () => import("../Pages/Home.vue"),
+        },
+        {
+            path: "/test",
+            component: () => import("../Pages/Test.vue"),
+        },
     ],
 });
 
