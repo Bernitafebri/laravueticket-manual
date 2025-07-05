@@ -3,7 +3,8 @@ import { createRouter, createWebHistory } from "vue-router";
 const routes = [
     {
         path: "/",
-        component: () => import("./Pages/Login.vue"),
+        // component: () => imxport("./Pages/Login.vue"),
+        component: () => import("./Pages/Auth/Login.vue"),
     },
     {
         path: "/home",
